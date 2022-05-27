@@ -1,45 +1,16 @@
 const { body, validationResult } = require('express-validator');
 
-const countries = [{
-        "id": 1,
-        "name": "Bhutan",
-        "alpha2Code": "BT",
-        "alpha3Code": "BTN"
-    },
-    {
-        "id": 2,
-        "name": "Austria",
-        "alpha2Code": "AT",
-        "alpha3Code": "AUT"
-    },
+const countries = require('../countriesDatabase');
 
-
-    {
-        "id": 4,
-        "name": "France",
-        "alpha2Code": "FR",
-        "alpha3Code": "FRA"
-    },
-    {
-        "id": 3,
-        "name": "Norway",
-        "alpha2Code": "NO",
-        "alpha3Code": "NOR"
-    },
-
-    {
-        "id": 5,
-        "name": "India",
-        "alpha2Code": "IN",
-        "alpha3Code": "IND"
-    }
-
-];
 
 const countryFinder = code => {
+    // console.log(code);
     if (!code) return null;
     const countryCode = code.toUpperCase();
-    return countries.find(country => country.alpha2Code === countryCode || country.alpha3Code === countryCode);
+    // console.log(countryCode);
+    // console.log(countries);
+    const temp = countries.find(country => (country.alpha2Code === countryCode) || (country.alpha3Code === countryCode));
+    return temp; //returns the country object
 }
 
 // const getAllCountries = (req, res) => {
@@ -88,6 +59,28 @@ const getAllCountries = (req, res) => {
     }
 };
 
+
+const getCountryByCode = (req, res) => {
+    try {
+        const { code } = req.params;
+        // console.log(req.params.code);
+        console.log(code);
+        const country = countryFinder(code)
+        console.log(country);
+        if (country) {
+            return res.status(200).json(country)
+        } else {
+            return res.status(404).json({
+                message: "Country not found"
+            })
+        }
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
+        })
+    }
+}
+
 const createCountry = (req, res) => {
     try {
         const { code } = req.params;
@@ -114,4 +107,4 @@ const createCountry = (req, res) => {
 
 
 
-module.exports = { getAllCountries, createCountry };
+module.exports = { getAllCountries, getCountryByCode, createCountry };
